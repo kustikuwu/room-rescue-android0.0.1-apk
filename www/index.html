@@ -6,10 +6,112 @@
   <title>Room Rescue</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css" />
+  <style>
+    /* Дополнительные стили для мобильного управления */
+    #joystick-container {
+      position: absolute;
+      bottom: 120px;
+      left: 50px;
+      width: 120px;
+      height: 120px;
+      z-index: 50;
+      display: none;
+      border-radius: 50%;
+      background: rgba(26, 58, 90, 0.7);
+      border: 4px solid #2c5a8a;
+      box-shadow: 0 0 20px rgba(0, 100, 255, 0.3);
+    }
+
+    #joystick {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      background: rgba(74, 246, 38, 0.7);
+      border-radius: 50%;
+      border: 3px solid #e0f0ff;
+      box-shadow: 0 0 15px rgba(74, 246, 38, 0.5);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    #gameScreen.active #joystick-container {
+      display: block;
+    }
+
+    #action-buttons {
+      position: absolute;
+      bottom: 120px;
+      right: 50px;
+      display: none;
+      gap: 30px;
+      z-index: 50;
+    }
+
+    .action-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(231, 76, 60, 0.7);
+      border: 3px solid #e0f0ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+      text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+    }
+
+    #gameScreen.active #action-buttons {
+      display: flex;
+    }
+
+    @media (max-width: 600px) {
+      #joystick-container {
+        width: 100px;
+        height: 100px;
+        bottom: 100px;
+        left: 30px;
+      }
+      
+      .action-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+      }
+      
+      #action-buttons {
+        bottom: 100px;
+        right: 30px;
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #joystick-container {
+        width: 80px;
+        height: 80px;
+        bottom: 90px;
+        left: 20px;
+      }
+      
+      #joystick {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .action-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- Убраны динамические пиксельные декорации -->
-  
   <!-- Главное меню -->
   <div id="mainMenu" class="screen active">
     <h1>ROOM RESCUE</h1>
@@ -46,10 +148,21 @@
       <p>Уровень <span id="completedLevelNumber"></span> завершён</p>
       <button id="continueButton">ДАЛЕЕ</button>
     </div>
+    
+    <!-- Виртуальный джойстик -->
+    <div id="joystick-container">
+      <div id="joystick"></div>
+    </div>
+    
+    <!-- Кнопки действий -->
+    <div id="action-buttons">
+      <div class="action-btn" data-action="a">A</div>
+      <div class="action-btn" data-action="b">B</div>
+    </div>
   </div>
 
-  <!-- Мобильное управление -->
-  <div id="mobile-controls">
+  <!-- Старое мобильное управление (скрыто по умолчанию) -->
+  <div id="mobile-controls" style="display: none;">
     <div class="dpad">
       <button class="btn-control" data-dir="up">↑</button>
       <button class="btn-control" data-dir="left">←</button>
@@ -79,6 +192,108 @@
         console.warn("localStorage не доступен, используется заглушка");
       }
     })();
+    
+    // Обработка виртуального джойстика
+    document.addEventListener('DOMContentLoaded', function() {
+      const joystickContainer = document.getElementById('joystick-container');
+      const joystick = document.getElementById('joystick');
+      const actionButtons = document.getElementById('action-buttons');
+      
+      if (!joystickContainer || !joystick) return;
+      
+      const maxDistance = 40;
+      let activeTouch = null;
+      
+      // Обработка событий джойстика
+      joystickContainer.addEventListener('touchstart', handleTouchStart);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+      
+      function handleTouchStart(e) {
+        if (activeTouch) return;
+        activeTouch = e.touches[0].identifier;
+        updateJoystickPosition(e.touches[0]);
+        e.preventDefault();
+      }
+      
+      function handleTouchMove(e) {
+        if (!activeTouch) return;
+        const touch = Array.from(e.touches).find(t => t.identifier === activeTouch);
+        if (touch) updateJoystickPosition(touch);
+        e.preventDefault();
+      }
+      
+      function handleTouchEnd(e) {
+        if (!activeTouch) return;
+        const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouch);
+        if (touch) resetJoystick();
+        e.preventDefault();
+      }
+      
+      function updateJoystickPosition(touch) {
+        const rect = joystickContainer.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const deltaX = touch.clientX - centerX;
+        const deltaY = touch.clientY - centerY;
+        
+        const distance = Math.min(maxDistance, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+        const angle = Math.atan2(deltaY, deltaX);
+        
+        const joyX = Math.cos(angle) * distance;
+        const joyY = Math.sin(angle) * distance;
+        
+        joystick.style.transform = `translate(${joyX}px, ${joyY}px)`;
+        
+        // Обновление управления
+        window.keys.up = joyY < -maxDistance / 2;
+        window.keys.down = joyY > maxDistance / 2;
+        window.keys.left = joyX < -maxDistance / 2;
+        window.keys.right = joyX > maxDistance / 2;
+      }
+      
+      function resetJoystick() {
+        joystick.style.transform = 'translate(-50%, -50%)';
+        activeTouch = null;
+        window.keys.up = false;
+        window.keys.down = false;
+        window.keys.left = false;
+        window.keys.right = false;
+      }
+      
+      // Обработка кнопок действий
+      document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('touchstart', (e) => {
+          window.keys[btn.dataset.action] = true;
+          btn.style.transform = 'scale(0.9)';
+          btn.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.5)';
+          e.preventDefault();
+        });
+        
+        btn.addEventListener('touchend', () => {
+          window.keys[btn.dataset.action] = false;
+          btn.style.transform = 'scale(1)';
+          btn.style.boxShadow = '0 0 15px rgba(231, 76, 60, 0.5)';
+        });
+        
+        btn.addEventListener('touchcancel', () => {
+          window.keys[btn.dataset.action] = false;
+          btn.style.transform = 'scale(1)';
+          btn.style.boxShadow = '0 0 15px rgba(231, 76, 60, 0.5)';
+        });
+      });
+      
+      // Определение мобильного устройства
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      }
+      
+      // Скрываем старое управление на мобильных
+      if (isMobileDevice()) {
+        document.getElementById('mobile-controls').style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
