@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Room Rescue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/style.css" />
+</head>
+<body>
+  <!-- Убраны динамические пиксельные декорации -->
+  
+  <!-- Главное меню -->
+  <div id="mainMenu" class="screen active">
+    <h1>ROOM RESCUE</h1>
+    <button id="playButton">ИГРАТЬ</button>
+    <button id="settingsButton">НАСТРОЙКИ</button>
+    <button id="exitButton">ВЫХОД</button>
+  </div>
+
+  <!-- Настройки -->
+  <div id="settingsMenu" class="screen">
+    <h2>НАСТРОЙКИ</h2>
+    <label>
+      ЗВУК:
+      <input type="checkbox" id="soundToggle" checked />
+    </label>
+    <button id="backFromSettings">НАЗАД</button>
+  </div>
+
+  <!-- Выбор уровня -->
+  <div id="levelSelect" class="screen">
+    <h2>ВЫБЕРИТЕ УРОВЕНЬ</h2>
+    <div id="levelButtons"></div>
+    <button id="backFromLevels">НАЗАД</button>
+  </div>
+
+  <!-- Игровой экран -->
+  <div id="gameScreen" class="screen">
+    <canvas id="gameCanvas"></canvas>
+    <progress id="trashProgress" value="0" max="0"></progress>
+    <button id="backFromGame">МЕНЮ</button>
+    
+    <div id="levelCompleteMessage" class="level-complete-message" style="display: none;">
+      <h2>УРОВЕНЬ ПРОЙДЕН!</h2>
+      <p>Уровень <span id="completedLevelNumber"></span> завершён</p>
+      <button id="continueButton">ДАЛЕЕ</button>
+    </div>
+  </div>
+
+  <!-- Мобильное управление -->
+  <div id="mobile-controls">
+    <div class="dpad">
+      <button class="btn-control" data-dir="up">↑</button>
+      <button class="btn-control" data-dir="left">←</button>
+      <button class="btn-control" data-dir="down">↓</button>
+      <button class="btn-control" data-dir="right">→</button>
+    </div>
+    <div class="ab-buttons">
+      <button class="btn-action" data-action="a">A</button>
+      <button class="btn-action" data-action="b">B</button>
+    </div>
+  </div>
+
+  <!-- Скрипты -->
+  <script src="src/js/menu.js"></script>
+  <script src="src/js/controls.js"></script>
+  <script src="src/js/game.js"></script>
+  <script src="src/js/levels.js"></script>
+  
+  <!-- Упрощенная обработка localStorage -->
+  <script>
+    (function() {
+      if (!window.localStorage) {
+        window.localStorage = {
+          getItem: () => null,
+          setItem: () => {}
+        };
+        console.warn("localStorage не доступен, используется заглушка");
+      }
+    })();
+  </script>
+</body>
+</html>
