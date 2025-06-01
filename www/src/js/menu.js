@@ -2,6 +2,8 @@
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
+  
+  if (window.updateCoinDisplay) updateCoinDisplay(); // <--- вставка
 }
 
 // Кнопки меню
@@ -27,3 +29,8 @@ document.getElementById('backFromSettings').addEventListener('click', () => {
 
 // Показываем главное меню при загрузке страницы
 showScreen('mainMenu');
+if (window.updateCoinDisplay) updateCoinDisplay();
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.updateCoinDisplay) updateCoinDisplay();
+});
