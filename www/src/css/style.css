@@ -432,3 +432,126 @@ progress::-webkit-progress-value {
 #gameScreen .screen {
   font-family: 'Press Start 2P', 'PixelFont', 'Courier New', monospace;
 }
+
+#coinDisplay {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 2px solid #4af626;
+  z-index: 10000;
+  color: #4af626;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  text-shadow: 0 0 5px rgba(74, 246, 38, 0.7);
+  pointer-events: none;
+}
+
+/* Магазин — вкладки */
+#shopTabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.shop-tab-btn {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 0.7em;
+  padding: 10px 18px;
+  border: 3px solid #2c5a8a;
+  background: #1a3a5a;
+  color: #e0f0ff;
+  box-shadow: 0 4px 0 #0a223a;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+}
+
+.shop-tab-btn:hover {
+  background: #2a4a7a;
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #0a223a;
+}
+
+.shop-tab-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #0a223a;
+}
+
+.shop-tab-btn.active {
+  border-color: #4af626;
+  background: #0f3a0f;
+  color: #4af626;
+  box-shadow: 0 4px 0 #2a7f2a;
+}
+
+/* Вкладки */
+.shop-tab {
+  display: none;
+}
+
+.shop-tab.active {
+  display: block;
+}
+
+/* Сетка товаров */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+  justify-items: center;
+  margin: 20px auto;
+  max-width: 700px;
+}
+
+/* Карточка товара */
+.shop-item {
+  background: rgba(10, 25, 41, 0.9);
+  border: 3px solid #2c5a8a;
+  padding: 12px;
+  text-align: center;
+  font-size: 12px;
+  width: 100%;
+  box-shadow: inset 0 0 10px rgba(0, 100, 255, 0.2);
+}
+
+.shop-color-preview {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #fff;
+  margin: 8px auto;
+  box-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
+
+/* Кнопка покупки/выбора */
+.shop-item button {
+  font-size: 10px;
+  padding: 6px 12px;
+  margin-top: 6px;
+  border: 2px solid #2c5a8a;
+  background: #1a3a5a;
+  color: #e0f0ff;
+  box-shadow: 0 3px 0 #0a223a;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.shop-item button:hover {
+  background: #2a4a7a;
+}
+
+.shop-item button:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #0a223a;
+}
+
+.shop-item button.selected {
+  background: #4af626;
+  color: #0a223a;
+  border-color: #4af626;
+  font-weight: bold;
+}
