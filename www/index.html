@@ -107,6 +107,7 @@
 
     #gameScreen.active #action-buttons {
       display: flex;
+      
     }
 
     /* Адаптивность */
@@ -162,10 +163,14 @@
   </style>
 </head>
 <body>
+    <div id="coinDisplay">
+    💰 <span id="coinCount">0</span>
+  </div>
   <!-- Главное меню -->
   <div id="mainMenu" class="screen active">
     <h1>ROOM RESCUE</h1>
     <button id="playButton">ИГРАТЬ</button>
+    <button id="shopButton">МАГАЗИН</button>
     <button id="settingsButton">НАСТРОЙКИ</button>
     <button id="exitButton">ВЫХОД</button>
   </div>
@@ -227,9 +232,40 @@
       <button class="btn-action" data-action="b">B</button>
     </div>
   </div>
+    <!-- Магазин -->
+  <div id="shopScreen" class="screen">
+    <h2>МАГАЗИН</h2>
+  
+    <div id="shopTabs">
+      <button class="shop-tab-btn active" data-tab="colors">ЦВЕТА</button>
+      <button class="shop-tab-btn" data-tab="boosters">БУСТЕРЫ</button>
+      <button class="shop-tab-btn" data-tab="roulette">РУЛЕТКА</button>
+    </div>
+  
+    <div id="shopContent">
+      <!-- Вкладка: Цвета -->
+      <div class="shop-tab active" data-tab="colors">
+        <div id="colorShop" class="shop-grid"></div>
+      </div>
+  
+      <!-- Вкладка: Бустеры -->
+      <div class="shop-tab" data-tab="boosters">
+        <p style="margin-top: 20px;">Бустеры появятся позже...</p>
+      </div>
+  
+      <!-- Вкладка: Рулетка -->
+      <div class="shop-tab" data-tab="roulette">
+        <p style="margin-top: 20px;">Рулетка будет добавлена в будущем!</p>
+      </div>
+    </div>
+  
+    <button id="backFromShop">НАЗАД</button>
+  </div>
 
   <!-- Скрипты -->
+  <script src="src/js/storage.js"></script>
   <script src="src/js/menu.js"></script>
+  <script src="src/js/shop.js"></script>
   <script src="src/js/controls.js"></script>
   <script src="src/js/game.js"></script>
   <script src="src/js/levels.js"></script>
