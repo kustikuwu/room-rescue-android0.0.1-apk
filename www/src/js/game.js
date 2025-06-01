@@ -278,7 +278,7 @@ function draw() {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px "Press Start 2P", Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(room.name, room.x + room.width / 2, room.y + 30);
+    ctx.fillText(room.name, room.x + room.width / 2, room.y + 48);
   }
   
   // Рисуем стены
