@@ -7,43 +7,73 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css" />
   <style>
-    /* Дополнительные стили для мобильного управления */
-    #joystick-container {
+    /* Стили для нового управления */
+    #arrow-controls {
       position: absolute;
-      bottom: 120px;
-      left: 50px;
-      width: 120px;
-      height: 120px;
-      z-index: 50;
+      bottom: 100px;
+      left: 30px;
       display: none;
-      border-radius: 50%;
-      background: rgba(26, 58, 90, 0.7);
-      border: 4px solid #2c5a8a;
-      box-shadow: 0 0 20px rgba(0, 100, 255, 0.3);
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      grid-gap: 8px;
+      z-index: 50;
     }
 
-    #joystick {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 50px;
-      height: 50px;
-      background: rgba(74, 246, 38, 0.7);
-      border-radius: 50%;
-      border: 3px solid #e0f0ff;
-      box-shadow: 0 0 15px rgba(74, 246, 38, 0.5);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+    #gameScreen.active #arrow-controls {
+      display: grid;
     }
 
-    #gameScreen.active #joystick-container {
-      display: block;
+    .arrow-btn {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(26, 58, 90, 0.9);
+      border: 4px solid;
+      border-top-color: #2c5a8a;
+      border-left-color: #2c5a8a;
+      border-right-color: #0a223a;
+      border-bottom-color: #0a223a;
+      box-shadow: 0 5px 0 #0a223a;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      font-size: 24px;
+      color: #e0f0ff;
+      text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+      border-radius: 8px;
+      transition: all 0.1s;
+      user-select: none;
+    }
+
+    .arrow-btn:active {
+      transform: translateY(5px);
+      box-shadow: 0 0 0 #0a223a;
+    }
+
+    .arrow-btn[data-dir="up"] {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .arrow-btn[data-dir="left"] {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .arrow-btn[data-dir="down"] {
+      grid-column: 2;
+      grid-row: 3;
+    }
+
+    .arrow-btn[data-dir="right"] {
+      grid-column: 3;
+      grid-row: 2;
     }
 
     #action-buttons {
       position: absolute;
-      bottom: 120px;
-      right: 50px;
+      bottom: 100px;
+      right: 30px;
       display: none;
       gap: 30px;
       z-index: 50;
@@ -53,28 +83,38 @@
       width: 70px;
       height: 70px;
       border-radius: 50%;
-      background: rgba(231, 76, 60, 0.7);
-      border: 3px solid #e0f0ff;
+      background: rgba(231, 76, 60, 0.9);
+      border: 4px solid;
+      border-top-color: #ff6b6b;
+      border-left-color: #ff6b6b;
+      border-right-color: #c44;
+      border-bottom-color: #c44;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Press Start 2P', 'Courier New', monospace;
       font-size: 24px;
       color: white;
-      box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+      box-shadow: 0 5px 0 #c44;
       text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+      transition: all 0.1s;
+    }
+
+    .action-btn:active {
+      transform: translateY(5px);
+      box-shadow: 0 0 0 #c44;
     }
 
     #gameScreen.active #action-buttons {
       display: flex;
     }
 
+    /* Адаптивность */
     @media (max-width: 600px) {
-      #joystick-container {
-        width: 100px;
-        height: 100px;
-        bottom: 100px;
-        left: 30px;
+      .arrow-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
       }
       
       .action-btn {
@@ -83,30 +123,40 @@
         font-size: 20px;
       }
       
+      #arrow-controls {
+        left: 20px;
+        bottom: 90px;
+      }
+      
       #action-buttons {
-        bottom: 100px;
-        right: 30px;
+        right: 20px;
+        bottom: 90px;
         gap: 20px;
       }
     }
 
     @media (max-width: 400px) {
-      #joystick-container {
-        width: 80px;
-        height: 80px;
-        bottom: 90px;
-        left: 20px;
-      }
-      
-      #joystick {
-        width: 40px;
-        height: 40px;
+      .arrow-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
       }
       
       .action-btn {
         width: 50px;
         height: 50px;
         font-size: 18px;
+      }
+      
+      #arrow-controls {
+        left: 15px;
+        bottom: 80px;
+      }
+      
+      #action-buttons {
+        right: 15px;
+        bottom: 80px;
+        gap: 15px;
       }
     }
   </style>
@@ -149,9 +199,12 @@
       <button id="continueButton">ДАЛЕЕ</button>
     </div>
     
-    <!-- Виртуальный джойстик -->
-    <div id="joystick-container">
-      <div id="joystick"></div>
+    <!-- Новое управление - стрелки -->
+    <div id="arrow-controls">
+      <div class="arrow-btn" data-dir="up">↑</div>
+      <div class="arrow-btn" data-dir="left">←</div>
+      <div class="arrow-btn" data-dir="down">↓</div>
+      <div class="arrow-btn" data-dir="right">→</div>
     </div>
     
     <!-- Кнопки действий -->
@@ -161,7 +214,7 @@
     </div>
   </div>
 
-  <!-- Старое мобильное управление (скрыто по умолчанию) -->
+  <!-- Старое мобильное управление (скрыто) -->
   <div id="mobile-controls" style="display: none;">
     <div class="dpad">
       <button class="btn-control" data-dir="up">↑</button>
@@ -193,94 +246,91 @@
       }
     })();
     
-    // Обработка виртуального джойстика
+    // Обработка нового управления
     document.addEventListener('DOMContentLoaded', function() {
-      const joystickContainer = document.getElementById('joystick-container');
-      const joystick = document.getElementById('joystick');
+      const arrowControls = document.getElementById('arrow-controls');
       const actionButtons = document.getElementById('action-buttons');
       
-      if (!joystickContainer || !joystick) return;
-      
-      const maxDistance = 40;
-      let activeTouch = null;
-      
-      // Обработка событий джойстика
-      joystickContainer.addEventListener('touchstart', handleTouchStart);
-      document.addEventListener('touchmove', handleTouchMove);
-      document.addEventListener('touchend', handleTouchEnd);
-      
-      function handleTouchStart(e) {
-        if (activeTouch) return;
-        activeTouch = e.touches[0].identifier;
-        updateJoystickPosition(e.touches[0]);
-        e.preventDefault();
-      }
-      
-      function handleTouchMove(e) {
-        if (!activeTouch) return;
-        const touch = Array.from(e.touches).find(t => t.identifier === activeTouch);
-        if (touch) updateJoystickPosition(touch);
-        e.preventDefault();
-      }
-      
-      function handleTouchEnd(e) {
-        if (!activeTouch) return;
-        const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouch);
-        if (touch) resetJoystick();
-        e.preventDefault();
-      }
-      
-      function updateJoystickPosition(touch) {
-        const rect = joystickContainer.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+      // Обработка стрелок
+      document.querySelectorAll('.arrow-btn').forEach(btn => {
+        // Для сенсорных устройств
+        btn.addEventListener('touchstart', (e) => {
+          window.keys[btn.dataset.dir] = true;
+          btn.style.transform = 'translateY(5px)';
+          btn.style.boxShadow = '0 0 0 #0a223a';
+          e.preventDefault();
+        });
         
-        const deltaX = touch.clientX - centerX;
-        const deltaY = touch.clientY - centerY;
+        btn.addEventListener('touchend', () => {
+          window.keys[btn.dataset.dir] = false;
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #0a223a';
+        });
         
-        const distance = Math.min(maxDistance, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
-        const angle = Math.atan2(deltaY, deltaX);
+        btn.addEventListener('touchcancel', () => {
+          window.keys[btn.dataset.dir] = false;
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #0a223a';
+        });
         
-        const joyX = Math.cos(angle) * distance;
-        const joyY = Math.sin(angle) * distance;
+        // Для десктопов (если нужно тестировать на ПК)
+        btn.addEventListener('mousedown', () => {
+          window.keys[btn.dataset.dir] = true;
+          btn.style.transform = 'translateY(5px)';
+          btn.style.boxShadow = '0 0 0 #0a223a';
+        });
         
-        joystick.style.transform = `translate(${joyX}px, ${joyY}px)`;
+        btn.addEventListener('mouseup', () => {
+          window.keys[btn.dataset.dir] = false;
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #0a223a';
+        });
         
-        // Обновление управления
-        window.keys.up = joyY < -maxDistance / 2;
-        window.keys.down = joyY > maxDistance / 2;
-        window.keys.left = joyX < -maxDistance / 2;
-        window.keys.right = joyX > maxDistance / 2;
-      }
-      
-      function resetJoystick() {
-        joystick.style.transform = 'translate(-50%, -50%)';
-        activeTouch = null;
-        window.keys.up = false;
-        window.keys.down = false;
-        window.keys.left = false;
-        window.keys.right = false;
-      }
+        btn.addEventListener('mouseleave', () => {
+          window.keys[btn.dataset.dir] = false;
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #0a223a';
+        });
+      });
       
       // Обработка кнопок действий
       document.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('touchstart', (e) => {
           window.keys[btn.dataset.action] = true;
-          btn.style.transform = 'scale(0.9)';
-          btn.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.5)';
+          btn.style.transform = 'translateY(5px)';
+          btn.style.boxShadow = '0 0 0 #c44';
           e.preventDefault();
         });
         
         btn.addEventListener('touchend', () => {
           window.keys[btn.dataset.action] = false;
-          btn.style.transform = 'scale(1)';
-          btn.style.boxShadow = '0 0 15px rgba(231, 76, 60, 0.5)';
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #c44';
         });
         
         btn.addEventListener('touchcancel', () => {
           window.keys[btn.dataset.action] = false;
-          btn.style.transform = 'scale(1)';
-          btn.style.boxShadow = '0 0 15px rgba(231, 76, 60, 0.5)';
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #c44';
+        });
+        
+        // Для десктопов
+        btn.addEventListener('mousedown', () => {
+          window.keys[btn.dataset.action] = true;
+          btn.style.transform = 'translateY(5px)';
+          btn.style.boxShadow = '0 0 0 #c44';
+        });
+        
+        btn.addEventListener('mouseup', () => {
+          window.keys[btn.dataset.action] = false;
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #c44';
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          window.keys[btn.dataset.action] = false;
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 5px 0 #c44';
         });
       });
       
