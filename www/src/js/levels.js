@@ -6,7 +6,7 @@ function loadLevelButtons() {
   const container = document.getElementById('levelButtons');
   container.innerHTML = '';
   
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 20; i++) {
     const btn = document.createElement('button');
     btn.textContent = `Уровень ${i}`;
     btn.disabled = i > maxUnlocked;
