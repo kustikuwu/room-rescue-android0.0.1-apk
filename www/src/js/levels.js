@@ -23,7 +23,8 @@ function startLevel(level) {
     if (typeof window.loadLevel === 'function') {
       window.loadLevel(level);
     }
-  }, 100);
+    
+  }, 150);
 }
 
 // Обработка кнопки "Назад" в игровом экране
@@ -32,6 +33,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (window.stopGame) window.stopGame();
     document.getElementById('levelCompleteMessage').style.display = 'none';
     showScreen('levelSelect');
+    loadLevelButtons(); // Добавленная строка
   });
 });
 
