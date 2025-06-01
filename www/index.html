@@ -330,7 +330,7 @@
         btn.addEventListener('mouseleave', () => {
           window.keys[btn.dataset.action] = false;
           btn.style.transform = 'translateY(0)';
-          btn.style.boxShadow = '0 5px 0 #c44';
+          btn.stylfe.boxShadow = '0 5px 0 #c44';
         });
       });
       
@@ -342,6 +342,8 @@
       // Скрываем старое управление на мобильных
       if (isMobileDevice()) {
         document.getElementById('mobile-controls').style.display = 'none';
+        showScreen('levelSelect');
+        loadLevelButtons();
       }
     });
   </script>
