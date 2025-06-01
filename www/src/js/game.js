@@ -21,6 +21,7 @@ let player = {
   vx: 0,
   vy: 0
 };
+let playerColor = getSelectedSkin();
 let trashList = [];
 let walls = [];
 let rooms = [];
@@ -63,6 +64,12 @@ function initSpatialGrid() {
     }
   }
 }
+
+function updateCoinDisplay() {
+  const el = document.getElementById('coinCount');
+  if (el && window.getCoins) el.textContent = getCoins();
+}
+
 
 function getNearbyWalls(x, y, width, height) {
   const startX = Math.floor(x / CELL_SIZE);
@@ -131,6 +138,7 @@ function loadLevel(level) {
     .catch(err => {
       console.error('Ошибка загрузки уровня:', err);
       createTestLevel();
+      updateCoinDisplay();
       startGameLoop();
     });
 }
@@ -180,6 +188,7 @@ function applyLevelData(data) {
   // Инициализируем пространственное разбиение
   initSpatialGrid();
   
+  playerColor = getSelectedSkin();
   startGameLoop();
 }
 
@@ -191,7 +200,7 @@ function update() {
     player.vy = 0;
     return;
   }
-  
+
   if (window.keys['b']) {
     window.keys['b'] = false;
     stopGame();
@@ -200,53 +209,68 @@ function update() {
   }
 
   handleInput();
-  
+
   const oldX = player.x;
   const oldY = player.y;
-  
+
   player.x += player.vx;
   player.y += player.vy;
-  
-  // Используем оптимизированную проверку коллизий
+
+  // Проверка коллизий со стенами
   const nearbyWalls = getNearbyWalls(player.x, player.y, player.width, player.height);
   let collided = false;
-  
+
   for (const wall of nearbyWalls) {
     if (isColliding(player, wall)) {
       collided = true;
       break;
     }
   }
-  
+
   if (collided) {
     player.x = oldX;
     player.y = oldY;
   }
-  
+
   player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
   player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
 
+  // Сбор мусора
   for (const trash of trashList) {
     if (!trash.collected && isColliding(player, trash)) {
       trash.collected = true;
       collected++;
       document.getElementById('trashProgress').value = collected;
-      
+
       if (window.playCollectSound) window.playCollectSound();
     }
   }
 
+  // Проверка завершения уровня
   if (collected === totalTrash && totalTrash > 0 && !levelCompleted) {
     levelCompleted = true;
+
+    // Начисление монет — только один раз за уровень
+    if (window.hasLevelRewarded && window.markLevelAsRewarded && window.addCoins) {
+      if (!hasLevelRewarded(currentLevel)) {
+        addCoins(5);
+        markLevelAsRewarded(currentLevel);
+        console.log(`[монеты] +5 монет за уровень ${currentLevel}`);
+      } else {
+        console.log(`[монеты] уровень ${currentLevel} уже был учтён`);
+      }
+      updateCoinDisplay();
+    }
+
     levelCompleteTime = Date.now();
-    
+
     const currentUnlocked = parseInt(localStorage.getItem('maxLevelUnlocked')) || 1;
     if (currentLevel >= currentUnlocked) {
       localStorage.setItem('maxLevelUnlocked', String(currentLevel + 1));
     }
-    
+
     if (window.playLevelCompleteSound) window.playLevelCompleteSound();
-    
+
     const message = document.getElementById('levelCompleteMessage');
     const levelNumber = document.getElementById('completedLevelNumber');
     if (message && levelNumber) {
@@ -255,6 +279,7 @@ function update() {
     }
   }
 }
+
 
 function draw() {
   // Очищаем только изменяющиеся области
@@ -321,10 +346,11 @@ function draw() {
   }
   
   // Рисуем игрока
-  ctx.fillStyle = '#27ae60';
+  // Рисуем игрока
+  ctx.fillStyle = playerColor || '#27ae60';
   ctx.fillRect(player.x, player.y, player.width, player.height);
   
-  ctx.fillStyle = '#1e8449';
+  ctx.fillStyle = darkenColor(playerColor || '#27ae60');
   ctx.fillRect(player.x, player.y, player.width, 2);
   ctx.fillRect(player.x, player.y, 2, player.height);
   
@@ -335,6 +361,15 @@ function draw() {
   ctx.fillRect(player.x + 4, player.y + 10, 8, 1);
   ctx.fillRect(player.x + 5, player.y + 11, 6, 1);
 }
+
+function darkenColor(hex, amount = 40) {
+  const num = parseInt(hex.slice(1), 16);
+  let r = Math.max(0, (num >> 16) - amount);
+  let g = Math.max(0, ((num >> 8) & 0x00FF) - amount);
+  let b = Math.max(0, (num & 0x0000FF) - amount);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 
 function gameLoop(timestamp) {
   // Ограничение FPS до 60
@@ -380,4 +415,5 @@ window.addEventListener('keyup', e => {
 });
 
 window.loadLevel = loadLevel;
+window.playerColor = playerColor;
 window.stopGame = stopGame;
