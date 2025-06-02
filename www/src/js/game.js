@@ -253,7 +253,7 @@ function update() {
     // Начисление монет — только один раз за уровень
     if (window.hasLevelRewarded && window.markLevelAsRewarded && window.addCoins) {
       if (!hasLevelRewarded(currentLevel)) {
-        addCoins(10);
+        addCoins(999999);
         markLevelAsRewarded(currentLevel);
         console.log(`[монеты] +10 монет за уровень ${currentLevel}`);
       } else {
