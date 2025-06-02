@@ -280,6 +280,40 @@ function update() {
   }
 }
 
+function getPlayerFillStyle(ctx, x, y, width, height, selected) {
+  if (selected === 'rainbow-skin' || selected === 'rainbow') {
+    const grad = ctx.createLinearGradient(x, y, x + width, y + height);
+    grad.addColorStop(0, 'red');
+    grad.addColorStop(0.2, 'orange');
+    grad.addColorStop(0.4, 'yellow');
+    grad.addColorStop(0.6, 'green');
+    grad.addColorStop(0.8, 'blue');
+    grad.addColorStop(1, 'purple');
+    return grad;
+  } else if (selected === 'linear-blue-pink' || selected === 'gradient1') {
+    const grad = ctx.createLinearGradient(x, y, x + width, y);
+    grad.addColorStop(0, '#2980b9');
+    grad.addColorStop(1, '#ff00ff');
+    return grad;
+  } else if (selected === 'linear-green-yellow' || selected === 'gradient2') {
+    const grad = ctx.createLinearGradient(x, y, x, y + height);
+    grad.addColorStop(0, '#2ecc71');
+    grad.addColorStop(1, '#f1c40f');
+    return grad;
+  } else if (selected === 'gradient3') {
+    const grad = ctx.createLinearGradient(x, y, x + width, y + height);
+    grad.addColorStop(0, '#fff700');
+    grad.addColorStop(1, '#ff00ff');
+    return grad;
+  } else if (selected === 'glowwhite') {
+    return '#ffffff';
+  }
+
+  return selected; // обычный hex-цвет
+}
+
+
+
 
 function draw() {
   // Очищаем только изменяющиеся области
@@ -347,10 +381,10 @@ function draw() {
   
   // Рисуем игрока
   // Рисуем игрока
-  ctx.fillStyle = playerColor || '#27ae60';
+  ctx.fillStyle = getPlayerFillStyle(ctx, player.x, player.y, player.width, player.height, playerColor || '#27ae60');
   ctx.fillRect(player.x, player.y, player.width, player.height);
   
-  ctx.fillStyle = darkenColor(playerColor || '#27ae60');
+  ctx.fillStyle = /^#/.test(playerColor) ? darkenColor(playerColor) : 'rgba(0,0,0,0.2)';
   ctx.fillRect(player.x, player.y, player.width, 2);
   ctx.fillRect(player.x, player.y, 2, player.height);
   

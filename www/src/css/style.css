@@ -498,15 +498,29 @@ progress::-webkit-progress-value {
   display: block;
 }
 
+#colorShop {
+  display: block;
+}
+
+#colorShop h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
 /* Сетка товаров */
 .shop-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
-  justify-items: center;
-  margin: 20px auto;
-  max-width: 700px;
+  max-width: 640px;          /* Ограничивает максимальную ширину */
+  margin: 0 auto;
+  width: 100%;               /* Чтобы занимало всю ширину контейнера */
 }
+
 
 /* Карточка товара */
 .shop-item {
@@ -515,7 +529,9 @@ progress::-webkit-progress-value {
   padding: 12px;
   text-align: center;
   font-size: 12px;
-  width: 100%;
+  width: 100%;               /* Растягивает в пределах сетки */
+  max-width: 110px;          /* Жёсткий предел по ширине */
+  box-sizing: border-box;    /* Учитывает padding в ширину */
   box-shadow: inset 0 0 10px rgba(0, 100, 255, 0.2);
 }
 
@@ -527,8 +543,8 @@ progress::-webkit-progress-value {
   box-shadow: 0 0 5px rgba(255,255,255,0.3);
 }
 
-/* Кнопка покупки/выбора */
-.shop-item button {
+
+.shop-item button { 
   font-size: 10px;
   padding: 6px 12px;
   margin-top: 6px;
@@ -539,6 +555,7 @@ progress::-webkit-progress-value {
   cursor: pointer;
   transition: all 0.1s;
 }
+
 
 .shop-item button:hover {
   background: #2a4a7a;
@@ -554,4 +571,55 @@ progress::-webkit-progress-value {
   color: #0a223a;
   border-color: #4af626;
   font-weight: bold;
+}
+
+.roulette-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 40px auto 20px;
+}
+
+.roulette-3slots {
+  display: flex;
+  flex-direction: row; /* ВАЖНО: делаем горизонтальную ориентацию */
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.slot {
+  width: 70px;
+  height: 70px;
+  border: 3px solid #999;
+  box-shadow: 0 0 5px rgba(255,255,255,0.3);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.arrow-marker {
+  font-size: 32px;
+  color: #4af626;
+  text-shadow: 0 0 10px #4af626;
+}
+
+.slot.rare {
+  border-color: gold;
+  box-shadow: 0 0 12px gold;
+}
+
+.slot.rare-temp {
+  border-color: orange;
+  box-shadow: 0 0 8px orange;
+}
+
+.color-category {
+  display: block;
+  max-width: 620px;
+  margin: 0 auto 40px;
+  padding: 0 10px;
+  text-align: center;
 }

@@ -245,7 +245,16 @@
     <div id="shopContent">
       <!-- Вкладка: Цвета -->
       <div class="shop-tab active" data-tab="colors">
-        <div id="colorShop" class="shop-grid"></div>
+        <div id="colorShop">
+          <div class="color-category">
+            <h3>🎨 Обычные цвета</h3>
+            <div class="shop-grid"></div>
+          </div>
+          <div class="color-category">
+            <h3>💎 Редкие цвета</h3>
+            <div class="shop-grid"></div>
+          </div>
+        </div>
       </div>
   
       <!-- Вкладка: Бустеры -->
@@ -255,7 +264,16 @@
   
       <!-- Вкладка: Рулетка -->
       <div class="shop-tab" data-tab="roulette">
-        <p style="margin-top: 20px;">Рулетка будет добавлена в будущем!</p>
+        <div class="roulette-container">
+          <div class="arrow-marker">▼</div>
+          <div class="roulette-3slots" id="roulette3Slots">
+            <div class="slot" id="slot-left"></div>
+            <div class="slot center" id="slot-center"></div>
+            <div class="slot" id="slot-right"></div>
+          </div>
+        </div>
+        <button id="spinWheelButton">КРУТИТЬ ЗА 25 💰</button>
+        <div id="rouletteResult" style="margin-top: 16px;"></div>
       </div>
     </div>
   
