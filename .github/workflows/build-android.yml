@@ -26,37 +26,29 @@ jobs:
       - name: Build release APK
         run: cordova build android --release
 
-      - name: Locate release APK
-        id: find_apk
+      - name: Просмотр структуры после сборки
         run: |
-          echo "Поиск APK..."
-          find platforms/android -type f -name "*.apk"
-          APK_PATH=$(find platforms/android -type f -name "*release*.apk" | grep -v 'unaligned' | head -n 1)
-          echo "Найден APK: $APK_PATH"
-          if [ -z "$APK_PATH" ]; then
-            echo "❌ APK не найден! Завершаем сборку."
-            exit 1
-          fi
-          echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
+          echo "Проверка содержимого папки outputs:"
+          ls -R platforms/android/app/build/outputs
 
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
 
       - name: Sign APK
         run: |
-          echo "Подписываем APK по пути: $APK_PATH"
+          echo "Подписываем .apk вручную по стандартному пути..."
           jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
             -keystore release.keystore \
             -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
             -keypass ${{ secrets.KEY_PASSWORD }} \
-            "$APK_PATH" \
+            platforms/android/app/build/outputs/apk/release/app-release.apk \
             ${{ secrets.KEY_ALIAS }}
 
       - name: Align signed APK
         run: |
           sudo apt-get update
           sudo apt-get install -y zipalign
-          zipalign -v 4 "$APK_PATH" app-signed.apk
+          zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release.apk app-signed.apk
 
       - name: Upload signed APK to GitHub Releases
         env:
