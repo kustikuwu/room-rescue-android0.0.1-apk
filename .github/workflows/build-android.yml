@@ -40,7 +40,11 @@ jobs:
 
       - name: Align and rename APK
         run: |
-          zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk app-signed.apk
+          sudo apt-get update
+          sudo apt-get install -y zipalign
+          zipalign -v 4 \
+            platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk \
+            app-signed.apk
 
       - name: Upload signed APK
         env:
