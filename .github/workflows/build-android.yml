@@ -23,15 +23,31 @@ jobs:
       - name: Add Android platform
         run: cordova platform add android
 
-      - name: Build Android APK
-        run: cordova build android
+      - name: Build release APK
+        run: cordova build android --release
 
-      - name: Upload release APK
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+
+      - name: Sign APK
+        run: |
+          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+            -keystore release.keystore \
+            -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+            -keypass ${{ secrets.KEY_PASSWORD }} \
+            platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk \
+            ${{ secrets.KEY_ALIAS }}
+
+      - name: Align and rename APK
+        run: |
+          zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk app-signed.apk
+
+      - name: Upload signed APK
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG_NAME="auto-build-$(date +%Y%m%d%H%M%S)"
+          TAG_NAME="release-$(date +%Y%m%d%H%M%S)"
           gh release create "$TAG_NAME" \
-            "platforms/android/app/build/outputs/apk/debug/app-debug.apk" \
-            --title "Room Rescue APK Build" \
-            --notes "Автоматически сгенерированная сборка"
+            "app-signed.apk" \
+            --title "Room Rescue APK" \
+            --notes "Подписанная сборка для установки/обновления"
