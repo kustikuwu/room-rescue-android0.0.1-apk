@@ -43,24 +43,29 @@ jobs:
 
       - name: Sign APK
         run: |
-          echo "🔐 Подписываем APK по пути: $APK_PATH"
-          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+          echo "🔐 Подписываем APK по пути: ${{ env.APK_PATH }}"
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
             -keystore release.keystore \
             -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
             -keypass ${{ secrets.KEY_PASSWORD }} \
-            "$APK_PATH" \
+            "${{ env.APK_PATH }}" \
             ${{ secrets.KEY_ALIAS }}
 
       - name: Align signed APK
         run: |
           sudo apt-get update
           sudo apt-get install -y zipalign
-          zipalign -v 4 "$APK_PATH" app-signed.apk
+          zipalign -v 4 "${{ env.APK_PATH }}" app-signed.apk
 
       - name: Upload signed APK to GitHub Releases
+        if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          if [ ! -f app-signed.apk ]; then
+            echo "❌ Не найден файл app-signed.apk"
+            exit 1
+          fi
           TAG_NAME="release-$(date +%Y%m%d%H%M%S)"
           gh release create "$TAG_NAME" \
             "app-signed.apk" \
