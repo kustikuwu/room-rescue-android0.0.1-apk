@@ -29,8 +29,14 @@ jobs:
       - name: Locate release APK
         id: find_apk
         run: |
-          APK_PATH=$(find platforms/android -type f -name '*release*.apk' | grep -v 'unaligned' | head -n 1)
-          echo "Found APK: $APK_PATH"
+          echo "Поиск APK..."
+          find platforms/android -type f -name "*.apk"
+          APK_PATH=$(find platforms/android -type f -name "*release*.apk" | grep -v 'unaligned' | head -n 1)
+          echo "Найден APK: $APK_PATH"
+          if [ -z "$APK_PATH" ]; then
+            echo "❌ APK не найден! Завершаем сборку."
+            exit 1
+          fi
           echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
 
       - name: Decode keystore
@@ -38,6 +44,7 @@ jobs:
 
       - name: Sign APK
         run: |
+          echo "Подписываем APK по пути: $APK_PATH"
           jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
             -keystore release.keystore \
             -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
