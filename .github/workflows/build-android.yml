@@ -26,6 +26,13 @@ jobs:
       - name: Build release APK
         run: cordova build android --release
 
+      - name: Locate release APK
+        id: find_apk
+        run: |
+          APK_PATH=$(find platforms/android -type f -name '*release*.apk' | grep -v 'unaligned' | head -n 1)
+          echo "Found APK: $APK_PATH"
+          echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
+
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
 
@@ -35,18 +42,16 @@ jobs:
             -keystore release.keystore \
             -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
             -keypass ${{ secrets.KEY_PASSWORD }} \
-            platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk \
+            "$APK_PATH" \
             ${{ secrets.KEY_ALIAS }}
 
-      - name: Align and rename APK
+      - name: Align signed APK
         run: |
           sudo apt-get update
           sudo apt-get install -y zipalign
-          zipalign -v 4 \
-            platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk \
-            app-signed.apk
+          zipalign -v 4 "$APK_PATH" app-signed.apk
 
-      - name: Upload signed APK
+      - name: Upload signed APK to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -54,4 +59,4 @@ jobs:
           gh release create "$TAG_NAME" \
             "app-signed.apk" \
             --title "Room Rescue APK" \
-            --notes "Подписанная сборка для установки/обновления"
+            --notes "Подписанная сборка, готовая к установке/обновлению"
