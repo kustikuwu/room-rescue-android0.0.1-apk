@@ -23,20 +23,19 @@ jobs:
       - name: Add Android platform
         run: cordova platform add android
 
-      - name: Build release APK
-        run: cordova build android --release
+      - name: Build release APK (force APK instead of AAB)
+        run: cordova build android --release -- --packageType=apk
 
-      - name: Просмотр структуры после сборки
+      - name: Show APK directory structure
         run: |
-          echo "Проверка содержимого папки outputs:"
+          echo "Содержимое build/outputs:"
           ls -R platforms/android/app/build/outputs
 
-      - name: Decode keystore
+      - name: Decode keystore from secret
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
 
       - name: Sign APK
         run: |
-          echo "Подписываем .apk вручную по стандартному пути..."
           jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
             -keystore release.keystore \
             -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
@@ -58,4 +57,4 @@ jobs:
           gh release create "$TAG_NAME" \
             "app-signed.apk" \
             --title "Room Rescue APK" \
-            --notes "Подписанная сборка, готовая к установке/обновлению"
+            --notes "Подписанная сборка, готовая к установке или обновлению"
