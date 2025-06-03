@@ -437,20 +437,20 @@ progress::-webkit-progress-value {
 }
 
 #coinDisplay {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  font-size: 14px;
+  position: absolute;
+  top: 72px; /* ниже кнопки */
+  left: 12px;
+  font-size: 12px;
   background: rgba(0, 0, 0, 0.5);
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
   border: 2px solid #4af626;
-  z-index: 10000;
+  z-index: 999;
   color: #4af626;
   font-family: 'Press Start 2P', 'Courier New', monospace;
-  text-shadow: 0 0 5px rgba(74, 246, 38, 0.7);
-  pointer-events: none;
+  text-shadow: 0 0 4px rgba(74, 246, 38, 0.6);
 }
+
 
 /* Магазин — вкладки */
 #shopTabs {
@@ -626,3 +626,24 @@ progress::-webkit-progress-value {
   padding: 0 10px;
   text-align: center;
 }
+
+#trashProgress {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 400px;
+  height: 20px;
+  z-index: 1000;
+}
+
+#backFromGame {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  font-size: 10px;
+  z-index: 1000;
+}
+

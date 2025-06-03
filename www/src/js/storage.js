@@ -1,5 +1,25 @@
+// Версия локального хранилища
+const CURRENT_STORAGE_VERSION = 1;
+
+(function initStorageVersioning() {
+  const version = parseInt(localStorage.getItem('storageVersion') || '0');
+
+  if (version < 1) {
+    if (!localStorage.getItem('coins')) localStorage.setItem('coins', '0');
+    if (!localStorage.getItem('purchasedSkins')) localStorage.setItem('purchasedSkins', '[]');
+    if (!localStorage.getItem('rewardedLevels')) localStorage.setItem('rewardedLevels', '[]');
+    if (!localStorage.getItem('selectedSkin')) localStorage.setItem('selectedSkin', '#27ae60');
+    if (!localStorage.getItem('maxLevelUnlocked')) localStorage.setItem('maxLevelUnlocked', '1');
+  }
+
+  // Обновляем версию после инициализации
+  localStorage.setItem('storageVersion', String(CURRENT_STORAGE_VERSION));
+})();
+
+// --- Работа с монетами ---
 function getCoins() {
-  return parseInt(localStorage.getItem('coins') || '0', 10);
+  const value = localStorage.getItem('coins');
+  return value !== null ? parseInt(value, 10) : 0;
 }
 
 function setCoins(value) {
@@ -15,6 +35,7 @@ window.getCoins = getCoins;
 window.setCoins = setCoins;
 window.addCoins = addCoins;
 
+// --- Награды за уровень ---
 function hasLevelRewarded(level) {
   const data = localStorage.getItem('rewardedLevels');
   if (!data) return false;
@@ -41,6 +62,7 @@ function markLevelAsRewarded(level) {
 window.hasLevelRewarded = hasLevelRewarded;
 window.markLevelAsRewarded = markLevelAsRewarded;
 
+// --- Скины ---
 function getPurchasedSkins() {
   const data = localStorage.getItem('purchasedSkins');
   if (!data) return [];
@@ -64,7 +86,7 @@ function purchaseSkin(color) {
 }
 
 function getSelectedSkin() {
-  return localStorage.getItem('selectedSkin') || '#27ae60'; // дефолт
+  return localStorage.getItem('selectedSkin') || '#27ae60';
 }
 
 function setSelectedSkin(color) {
