@@ -160,12 +160,35 @@
         gap: 15px;
       }
     }
+
+      #rotateWarning {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 25, 41, 0.95);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #4af626;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
     <div id="coinDisplay">
     💰 <span id="coinCount">0</span>
   </div>
+  
+  <!-- Предупреждение о повороте -->
+  <div id="rotateWarning" style="display: none;">
+    <div class="rotate-overlay">
+      <p>Поверни телефон горизонтально</p>
+    </div>
+  </div>
+
   <!-- Главное меню -->
   <div id="mainMenu" class="screen active">
     <h1>ROOM RESCUE</h1>
@@ -290,6 +313,15 @@
   
   <!-- Упрощенная обработка localStorage -->
   <script>
+      function checkOrientation() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        document.getElementById('rotateWarning').style.display = isLandscape ? 'none' : 'flex';
+      }
+
+      window.addEventListener('resize', checkOrientation);
+      window.addEventListener('orientationchange', checkOrientation);
+      window.addEventListener('DOMContentLoaded', checkOrientation);
+
     (function() {
       if (!window.localStorage) {
         window.localStorage = {
@@ -399,6 +431,7 @@
         showScreen('levelSelect');
         loadLevelButtons();
       }
+      
     });
   </script>
 </body>
