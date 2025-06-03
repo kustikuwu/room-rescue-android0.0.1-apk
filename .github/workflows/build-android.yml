@@ -23,31 +23,39 @@ jobs:
       - name: Add Android platform
         run: cordova platform add android
 
-      - name: Build release APK (force APK instead of AAB)
-        run: cordova build android --release -- --packageType=apk
+      - name: Build release APK
+        run: cordova build android --release -- --packageType=apk || cordova build android --release
 
-      - name: Show APK directory structure
+      - name: Find APK path
+        id: find_apk
         run: |
-          echo "Содержимое build/outputs:"
-          ls -R platforms/android/app/build/outputs
+          echo "🔍 Ищем .apk файл..."
+          APK_PATH=$(find platforms/android -type f -name "*.apk" | grep -v 'unaligned' | head -n 1)
+          echo "Найден APK: $APK_PATH"
+          if [ -z "$APK_PATH" ]; then
+            echo "❌ APK не найден. Завершаем сборку."
+            exit 1
+          fi
+          echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
 
-      - name: Decode keystore from secret
+      - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
 
       - name: Sign APK
         run: |
+          echo "🔐 Подписываем APK по пути: $APK_PATH"
           jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
             -keystore release.keystore \
             -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
             -keypass ${{ secrets.KEY_PASSWORD }} \
-            platforms/android/app/build/outputs/apk/release/app-release.apk \
+            "$APK_PATH" \
             ${{ secrets.KEY_ALIAS }}
 
       - name: Align signed APK
         run: |
           sudo apt-get update
           sudo apt-get install -y zipalign
-          zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release.apk app-signed.apk
+          zipalign -v 4 "$APK_PATH" app-signed.apk
 
       - name: Upload signed APK to GitHub Releases
         env:
@@ -57,4 +65,4 @@ jobs:
           gh release create "$TAG_NAME" \
             "app-signed.apk" \
             --title "Room Rescue APK" \
-            --notes "Подписанная сборка, готовая к установке или обновлению"
+            --notes "Подписанная сборка, готовая к установке"
